@@ -239,7 +239,7 @@ npm run _compile.watch # Watch mode compilation during development
 
 ## 🎨 Why "Spooky"?
 
-Because dealing with TypeScript compilations in Odoo can be scary, but SpookyTS makes it friendly! 🎃 And also because I am known as the **Shade**. This project is a WIP and is intended mainly for my purposes as I am testing new things out in my workplace.
+Because dealing with TypeScript compilations in Odoo can be scary, but SpookyTS makes it friendly! 🎃 And also because I am known as the **Shade**. This project is a WIP and is intended mainly for my purposes as I am testing new things out at my workplace.
 
 ## 📄 License
 
