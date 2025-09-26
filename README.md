@@ -252,6 +252,7 @@ MIT License - see [LICENSE](LICENSE) file for details.
 ## 🐛 Known Issues
 
 - Imports are kind of messy and need to be adjusted explicitly when using spookyts for Odoo.
+- No support for third party type definitions commonly used in Vue.js or React :-(
 - I am sure more issues will occur when using in real odoo modules. I guess we will see. 
 
 ---
