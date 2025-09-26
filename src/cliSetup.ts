@@ -15,5 +15,6 @@ export function cliSetup() {
         .argument("[destinations...]", "Destinations to convert ts files.")
         .option("-q, --quiet", "Suppress output", false)
         .option("-d, --dry", "Run in dry mode. Only show what would be compiled without actually compiling anything.", false)
+        .option("-u, --uncapped", "Uncap the search safety and allow spookyts to convert all ts folders in given destinations", false)
         .action(compile);
 }

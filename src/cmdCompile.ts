@@ -23,7 +23,7 @@ class SpookyTS {
 
     private validateDestinationsNotEmpty(): void {
         if (this.destinations.length === 0)
-            globalThis.program.error("No destinations provided. Please specify at least one directory to purge Node.js modules.");
+            globalThis.program.error("No destinations provided. Please specify at least one directory to convert ts folders into js folders.");
     }
 
     private finishSystem(): void {
@@ -70,19 +70,28 @@ class SpookyTS {
 
     private async findTsFolders(dir: string): Promise<string[]> {
         const tsFolders: string[] = [];
+        const uncapped = this.options.uncapped
+        let foundTsFolder = false;
 
         async function walkDir(currentDir: string): Promise<void> {
+            if (foundTsFolder) return;
+
             try {
                 const entries = await readdir(currentDir, { withFileTypes: true });
 
                 for (const entry of entries) {
+                    if (foundTsFolder) return;
                     const fullPath = join(currentDir, entry.name);
 
                     if (!entry.isDirectory()) {
-                        return;
+                        continue;
                     }
                     if (entry.name === 'ts') {
                         tsFolders.push(fullPath);
+                        if (!uncapped) {
+                            foundTsFolder = true;
+                            return;
+                        }
                     } else {
                         if (!['node_modules', '.git', '.vscode'].includes(entry.name)) {
                             await walkDir(fullPath);
