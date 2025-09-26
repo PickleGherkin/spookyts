@@ -2,7 +2,7 @@
   "name": "spookyts",
   "version": "1.0.0",
   "description": "A typescript translation layer which compiles ts files to js files while maintaining project structure for odoo projects.",
-  "license": "ISC",
+  "license": "MIT",
   "author": "shade",
   "module": "next",
   "bin": {

@@ -11,19 +11,13 @@ class SpookyTS {
 
     public static async compile(destinations: string[], options: OptionValues): Promise<void> {
         const spookyts = new SpookyTS(destinations, options);
-        spookyts.validateDestinationsNotEmpty();
         await spookyts.walkDestinations();
         spookyts.finishSystem();
     }
-
+    
     private prepareSystem(): void {
         if (!this.options.quiet)
             console.log('🎃 SpookyTS: Starting TypeScript compilation for Odoo v16...');
-    }
-
-    private validateDestinationsNotEmpty(): void {
-        if (this.destinations.length === 0)
-            globalThis.program.error("No destinations provided. Please specify at least one directory to convert ts folders into js folders.");
     }
 
     private finishSystem(): void {
