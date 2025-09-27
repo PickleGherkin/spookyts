@@ -17,13 +17,13 @@ export function getLogoAndVersion() {
 export function cliSetup() {
     program
         .version("1.0.0")
-        .description("A typescript translation layer which compiles ts files to js files while maintaining project structure for odoo projects.");
+        .description("A TypeScript translation layer that compiles TypeScript files to JavaScript while maintaining project structure for Odoo projects.");
 
     program.command("compile")
-        .argument("[destinations...]", "Destinations to convert ts files.")
+        .argument("[destinations...]", "Destinations to convert ts folders into js folders")
         .option("-q, --quiet", "Suppress output messages", false)
-        .option("-d, --dry", "Run in dry mode. Show what would be compiled without actually compiling.", false)
-        .option("-u, --uncapped", "Remove safety limit and process all ts/ folders found.", false)
+        .option("-d, --dry", "Show what would be compiled without actually compiling", false)
+        .option("-u, --uncapped", "Remove safety limit and process all ts/ folders found", false)
         .hook("preAction", compile => {
             if (compile.args.length === 0){
                 compile.help();

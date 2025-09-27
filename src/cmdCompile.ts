@@ -5,6 +5,9 @@ import { dirname, join, relative, resolve } from 'path';
 import * as ts from 'typescript';
 
 class SpookyTS {
+    private tsFileCount = 0;
+    private tsFolderCount = 0;
+
     private constructor(private destinations: string[], private options: OptionValues) {
         this.prepareSystem();
     }
@@ -14,15 +17,29 @@ class SpookyTS {
         await spookyts.walkDestinations();
         spookyts.finishSystem();
     }
-    
+
     private prepareSystem(): void {
         if (!this.options.quiet)
             console.log('🎃 SpookyTS: Starting TypeScript compilation for Odoo v16...');
     }
 
     private finishSystem(): void {
-        if (!this.options.quiet)
-            console.log('✅ SpookyTS: Compilation completed!');
+        if (this.options.quiet || this.options.dry)
+            return;
+        switch (this.tsFolderCount) {
+            case 0: {
+                console.log(`❌  SpookyTS: Compilation aborted. No 'ts' folders were found.`);
+                return;
+            }
+            case 1: {
+                console.log(`✅ SpookyTS: Compilation completed! Compiled ${this.tsFileCount} TypeScript files.`);
+                return;
+            }
+            default: {
+                console.log(`✅ SpookyTS: Compilation completed! Compiled ${this.tsFolderCount} TypeScript folders containing ${this.tsFileCount} TypeScript files in total.`);
+                return;
+            }
+        }
     }
 
     private async walkDestinations(): Promise<void> {
@@ -53,6 +70,7 @@ class SpookyTS {
             }
             return;
         }
+        this.tsFolderCount += tsFolders.length;
 
         for (const tsFolder of tsFolders) {
             if (!this.options.quiet) {
@@ -65,16 +83,16 @@ class SpookyTS {
     private async findTsFolders(dir: string): Promise<string[]> {
         const tsFolders: string[] = [];
         const uncapped = this.options.uncapped
-        let foundTsFolder = false;
+        let hasTsFolder = false;
 
         async function walkDir(currentDir: string): Promise<void> {
-            if (foundTsFolder) return;
+            if (hasTsFolder) return;
 
             try {
                 const entries = await readdir(currentDir, { withFileTypes: true });
 
                 for (const entry of entries) {
-                    if (foundTsFolder) return;
+                    if (hasTsFolder) return;
                     const fullPath = join(currentDir, entry.name);
 
                     if (!entry.isDirectory()) {
@@ -83,7 +101,7 @@ class SpookyTS {
                     if (entry.name === 'ts') {
                         tsFolders.push(fullPath);
                         if (!uncapped) {
-                            foundTsFolder = true;
+                            hasTsFolder = true;
                             return;
                         }
                     } else {
@@ -134,56 +152,60 @@ class SpookyTS {
             return;
         }
 
-        if (!this.options.dry) {
-            if (!existsSync(jsFolder)) {
-                await mkdir(jsFolder, { recursive: true });
-            }
+        if (this.options.dry && this.options.quiet) {
+            return;
+        } else if (this.options.dry) {
+            console.log(`🔍 [DRY RUN] Would compile ${tsFiles.length} TypeScript files`);
+            tsFiles.forEach(file => {
+                const relativePath = relative(tsFolder, file);
+                const outputPath = join(jsFolder, relativePath.replace(/\.ts$/, '.js'));
+                console.log(`  ${file} → ${outputPath}`);
+            });
+            return;
+        }
 
-            // Compile TypeScript files
-            const program = ts.createProgram(tsFiles, compilerOptions);
-            const emitResult = program.emit();
+        if (!existsSync(jsFolder)) {
+            await mkdir(jsFolder, { recursive: true });
+        }
 
-            // Check for compilation errors
-            const allDiagnostics = ts
-                .getPreEmitDiagnostics(program)
-                .concat(emitResult.diagnostics);
+        // Compile TypeScript files
+        const program = ts.createProgram(tsFiles, compilerOptions);
+        const emitResult = program.emit();
 
-            if (allDiagnostics.length > 0) {
-                console.error('❌ TypeScript compilation errors:');
-                allDiagnostics.forEach(diagnostic => {
-                    if (diagnostic.file) {
-                        const { line, character } = ts.getLineAndCharacterOfPosition(
-                            diagnostic.file,
-                            diagnostic.start!
-                        );
-                        const message = ts.flattenDiagnosticMessageText(
-                            diagnostic.messageText,
-                            '\n'
-                        );
-                        console.error(
-                            `${diagnostic.file.fileName} (${line + 1},${character + 1}): ${message}`
-                        );
-                    } else {
-                        console.error(
-                            ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n')
-                        );
-                    }
-                });
-            } else if (!this.options.quiet) {
+        // Check for compilation errors
+        const allDiagnostics = ts
+            .getPreEmitDiagnostics(program)
+            .concat(emitResult.diagnostics);
+
+        if (allDiagnostics.length !== 0) {
+            console.error('❌ TypeScript compilation errors:');
+            allDiagnostics.forEach(diagnostic => {
+                if (diagnostic.file) {
+                    const { line, character } = ts.getLineAndCharacterOfPosition(
+                        diagnostic.file,
+                        diagnostic.start!
+                    );
+                    const message = ts.flattenDiagnosticMessageText(
+                        diagnostic.messageText,
+                        '\n'
+                    );
+                    console.error(
+                        `${diagnostic.file.fileName} (${line + 1},${character + 1}): ${message}`
+                    );
+                } else {
+                    console.error(
+                        ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n')
+                    );
+                }
+            });
+        } else {
+            this.tsFileCount += tsFiles.length;
+            if (!this.options.quiet) {
                 console.log(`✅ Successfully compiled ${tsFiles.length} files`);
             }
-
-            await this.copyNonTsFiles(tsFolder, jsFolder);
-        } else {
-            if (!this.options.quiet) {
-                console.log(`🔍 [DRY RUN] Would compile ${tsFiles.length} TypeScript files`);
-                tsFiles.forEach(file => {
-                    const relativePath = relative(tsFolder, file);
-                    const outputPath = join(jsFolder, relativePath.replace(/\.ts$/, '.js'));
-                    console.log(`  ${file} → ${outputPath}`);
-                });
-            }
         }
+
+        await this.copyNonTsFiles(tsFolder, jsFolder);
     }
 
     private async findTsFiles(dir: string): Promise<string[]> {

@@ -1,7 +1,7 @@
 {
   "name": "spookyts",
   "version": "1.0.0",
-  "description": "A typescript translation layer which compiles ts files to js files while maintaining project structure for odoo projects.",
+  "description": "A TypeScript translation layer that compiles TypeScript files to JavaScript while maintaining project structure for Odoo projects.",
   "license": "MIT",
   "author": "shade",
   "module": "next",
@@ -17,13 +17,13 @@
     "build": "npm run pretest"
   },
   "dependencies": {
-    "commander": "^11.0.0"
+    "commander": "^11.0.0",
+    "typescript": "^5.9.2"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
     "copyfiles": "^2.4.1",
     "npm-run-all": "^4.1.5",
-    "ts-node": "^10.0.0",
-    "typescript": "^5.0.0"
+    "ts-node": "^10.0.0"
   }
 }
