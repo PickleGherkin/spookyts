@@ -105,7 +105,7 @@ class SpookyTS {
                             return;
                         }
                     } else {
-                        if (!['node_modules', '.git', '.vscode'].includes(entry.name)) {
+                        if (!['node_modules', 'coverage', '.git', '.vscode'].includes(entry.name)) {
                             await walkDir(fullPath);
                         }
                     }
