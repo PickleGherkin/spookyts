@@ -47,7 +47,10 @@ class SpookyTS {
             try {
                 await this.processLocation(destination);
             } catch (error) {
-                globalThis.program.error(`❌ Error processing location '${destination}':`, error);
+                if (error instanceof Error) {
+                    globalThis.program.error(`❌ Error processing location '${destination}': ${error.message}`);
+                }
+                globalThis.program.error(`❌ Error processing location '${destination}'`);
             }
         }
     }
@@ -110,7 +113,7 @@ class SpookyTS {
                         }
                     }
                 }
-            } catch (error) {
+            } catch {
                 // Skip directories that can't be read
             }
         }
@@ -224,7 +227,7 @@ class SpookyTS {
                         tsFiles.push(fullPath);
                     }
                 }
-            } catch (error) {
+            } catch {
                 // Skip directories we can't read
             }
         }
@@ -255,7 +258,7 @@ class SpookyTS {
                         }
                     }
                 }
-            } catch (error) {
+            } catch {
                 // Skip files we can't copy
             }
         }

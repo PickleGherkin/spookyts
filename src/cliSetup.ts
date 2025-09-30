@@ -25,7 +25,7 @@ export function cliSetup() {
         .option("-d, --dry", "Show what would be compiled without actually compiling", false)
         .option("-u, --uncapped", "Remove safety limit and process all ts/ folders found", false)
         .hook("preAction", compile => {
-            if (compile.args.length === 0){
+            if (compile.args.length === 0) {
                 compile.help();
             }
         })
