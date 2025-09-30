@@ -4,6 +4,15 @@ export default defineConfig({
     test: {
         globals: true,
         environment: "node",
-        fileParallelism: false
+        fileParallelism: false,
+        coverage: {
+            include: [
+                "src/**.ts"
+            ],
+            exclude: [
+                "src/spookyts.ts"
+            ]
+        },
+        testTimeout: 10000
     }
 })
