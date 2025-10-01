@@ -251,11 +251,11 @@ MIT License - see [LICENSE](LICENSE) file for details.
 
 ## 🐛 Known Issues
 
-- Imports are kind of messy and need to be adjusted explicitly when using spookyts for Odoo.
-- No support for third party type definitions commonly used in Vue.js or React :-(
+- Imports are kind of messy and need to be adjusted explicitly when using spookyts for Odoo modules.
+- No support for third party type definitions (Vue types, Odoo types)
 - No support for TSX files
-- I am sure more issues will occur when using in real odoo modules. I guess we will see. 
-
+- Modules need to be rewritten in TypeScript to ensure type safety
+- Still requires tsconfig.json (even though spookyts already features a basic config) to set valuable configs inside of modules.
 ---
 
 *A sword wields no strength unless the hand that holds it has courage. You may be destined to become the hero of legend... but your current power would disgrace the proud green of the hero's tunic you wear. You must use your courage to seek power... and find it you must. Only then will you become the hero for whom this world despairs 🎃 ~ Hero's Shade*
